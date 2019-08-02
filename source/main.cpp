@@ -82,13 +82,24 @@ static u_int32_t packetFilter(struct nfq_data *tb, bool *isAccept)
 								parseHTTP(data + packetIndex, tcp_size, &httpHeader);
 								//printPacket(data + dataIndex, tcp_size);
 								std::string host = httpHeader["Host"];
+								std::string method = httpHeader["method"];
+
 								char rulesCheckHTTPHost[2014];
+								char rulesCheckHTTPMethod[26];
 								sprintf(rulesCheckHTTPHost, "DROP HTTP HOST %s", host.c_str());
+								sprintf(rulesCheckHTTPMethod, "DROP HTTP METHOD %s", method.c_str());
 								rulesIt = rules.find(rulesCheckHTTPHost);
 								*isAccept = rulesIt != rules.end() ? false : *isAccept && true;
 								if (!*isAccept)
 								{
 									std::cout << "[*] HTTP HOST BLOCK : " << host << std::endl;
+								}
+								
+								rulesIt = rules.find(rulesCheckHTTPMethod);
+								*isAccept = rulesIt != rules.end() ? false : *isAccept && true;
+								if (!*isAccept)
+								{
+									std::cout << "[*] HTTP METHOD BLOCK : " << method << std::endl;
 								}
 							}
 						}
